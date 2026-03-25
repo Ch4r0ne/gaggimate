@@ -478,7 +478,7 @@ void Controller::lowerTemp() {
 }
 
 void Controller::raiseBrewTarget() {
-    if (settings.isVolumetricTarget() && isVolumetricAvailable()) {
+    if (isVolumetricAvailable() && profileManager->getSelectedProfile().isVolumetric()) {
         profileManager->getSelectedProfile().adjustVolumetricTarget(1);
     } else {
         profileManager->getSelectedProfile().adjustDuration(1);
@@ -487,7 +487,7 @@ void Controller::raiseBrewTarget() {
 }
 
 void Controller::lowerBrewTarget() {
-    if (settings.isVolumetricTarget() && isVolumetricAvailable()) {
+    if (isVolumetricAvailable() && profileManager->getSelectedProfile().isVolumetric()) {
         profileManager->getSelectedProfile().adjustVolumetricTarget(-1);
     } else {
         profileManager->getSelectedProfile().adjustDuration(-1);
@@ -589,8 +589,9 @@ void Controller::activate() {
     switch (mode) {
     case MODE_BREW:
         startProcess(new BrewProcess(profileManager->getSelectedProfile(),
-                                     settings.isVolumetricTarget() && isVolumetricAvailable() ? ProcessTarget::VOLUMETRIC
-                                                                                              : ProcessTarget::TIME,
+                                     profileManager->getSelectedProfile().isVolumetric() && isVolumetricAvailable()
+                                         ? ProcessTarget::VOLUMETRIC
+                                         : ProcessTarget::TIME,
                                      settings.getBrewDelay()));
         break;
     case MODE_STEAM:
@@ -702,8 +703,8 @@ void Controller::onProfileSaveAsNew() {
     profile.label = "Copy of " + profileManager->getSelectedProfile().label;
     profile.id = generateShortID();
     settings.setSelectedProfile(profile.id);
-    settings.addFavoritedProfile(profile.id);
     profileManager->saveProfile(profileManager->getSelectedProfile());
+    profileManager->addFavoritedProfile(profile.id);
 }
 
 void Controller::onVolumetricMeasurement(double measurement, VolumetricMeasurementSource source) {
@@ -739,6 +740,12 @@ void Controller::onFlush() {
     clear();
     startProcess(new BrewProcess(FLUSH_PROFILE, ProcessTarget::TIME, settings.getBrewDelay()));
     pluginManager->trigger("controller:brew:start");
+}
+
+void Controller::onVolumetricDelete() {
+    if (profileManager->getSelectedProfile().isVolumetric()) {
+        profileManager->getSelectedProfile().removeVolumetricTarget();
+    }
 }
 
 void Controller::handleBrewButton(int brewButtonStatus) {
