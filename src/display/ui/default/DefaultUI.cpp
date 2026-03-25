@@ -324,6 +324,7 @@ void DefaultUI::onProfileSelect() {
 void DefaultUI::onVolumetricDelete() {
     controller->onVolumetricDelete();
     profileVolumetric = profileManager->getSelectedProfile().isVolumetric();
+    profileDirty = true;
 }
 
 void DefaultUI::setupPanel() {
