@@ -163,6 +163,8 @@ void DefaultUI::init() {
             Settings &settings = controller->getSettings();
             if (settings.getStartupMode() == MODE_BREW) {
                 changeScreen(&ui_BrewScreen, &ui_BrewScreen_screen_init);
+            } else {
+                standbyEnterTime = millis();
             }
         }
         pressureAvailable = controller->getSystemInfo().capabilities.pressure;
