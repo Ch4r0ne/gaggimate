@@ -222,10 +222,10 @@ void Controller::setupWifi() {
             WiFi.onEvent(
                 [this](WiFiEvent_t, WiFiEventInfo_t info) {
                     ESP_LOGI(LOG_TAG, "Lost WiFi connection. Reason: %d", info.wifi_sta_disconnected.reason);
+                    pluginManager->trigger("controller:wifi:disconnect");
                     if (!isApConnection) {
                         WiFi.reconnect();
                     }
-                    pluginManager->trigger("controller:wifi:disconnect");
                 },
                 WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
             configTzTime(resolve_timezone(settings.getTimezone()), NTP_SERVER);
