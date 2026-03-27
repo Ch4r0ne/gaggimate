@@ -224,6 +224,7 @@ void Controller::setupWifi() {
                     ESP_LOGI(LOG_TAG, "Lost WiFi connection. Reason: %d", info.wifi_sta_disconnected.reason);
                     pluginManager->trigger("controller:wifi:disconnect");
                     if (!isApConnection) {
+                        ESP_LOGI(LOG_TAG, "Trying reconnect to WiFi...");
                         WiFi.reconnect();
                     }
                 },
